@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BINDS Workshop Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🌿 BINDS 2026</div>
+            <div class="nav-menu">
+                <button class="nav-btn active" data-page="home">🏠 Home</button>
+                <button class="nav-btn" data-page="registration">📝 Register</button>
+                <button class="nav-btn" data-page="attendance">✅ Attendance</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+        <div class="container">
+            <div class="home-card">
+                <h1>🌿 Bridging Nature with Data Science</h1>
+                <h2>BINDS – Chapter 2</h2>
+                
+                <div class="info-box">
+                    <p><strong>📅 Dates:</strong> 29-31 January 2026</p>
+                    <p><strong>🏫 Venue:</strong> Azim Premji University, Bhopal</p>
+                    <p><strong>💡 Tagline:</strong> Turn Data into Actionable Solutions</p>
+                </div>
+
+                <div class="home-buttons">
+                    <button class="btn btn-primary" data-page="registration">📝 Register Participant</button>
+                    <button class="btn btn-success" data-page="attendance">✅ Mark Attendance</button>
+                </div>
+
+                <div class="stats-box">
+                    <div class="stat">
+                        <div class="stat-number" id="totalParticipants">0</div>
+                        <div class="stat-label">Registered</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="totalAttendance">0</div>
+                        <div class="stat-label">Attended Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTRATION PAGE -->
+    <div id="registration" class="page">
+        <div class="container">
+            <h1>Participant Registration</h1>
+            
+            <div class="two-column">
+                <!-- Registration Form -->
+                <div class="card">
+                    <h2>Register New Participant</h2>
+                    <form id="registrationForm">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="participantName" placeholder="John Doe" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email ID *</label>
+                            <input type="email" id="participantEmail" placeholder="john@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Institute/Organization *</label>
+                            <input type="text" id="participantInstitute" placeholder="IIT Bhopal" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">✅ Register & Generate ID</button>
+                    </form>
+                </div>
+
+                <!-- ID Card Preview -->
+                <div class="card">
+                    <h2>ID Card Preview</h2>
+                    <div id="idCardPreview" class="id-card" style="display: none;">
+                        <div class="id-card-header">
+                            <div class="id-card-title">🌿 BINDS – Chapter 2</div>
+                        </div>
+                        <div id="qrCodeContainer" style="text-align: center; padding: 20px;"></div>
+                        <div class="id-card-body">
+                            <div class="id-field">
+                                <span class="id-label">Name:</span>
+                                <span id="cardName" class="id-value">-</span>
+                            </div>
+                            <div class="id-field">
+                                <span class="id-label">ID:</span>
+                                <span id="cardId" class="id-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="downloadIdCard" class="btn btn-success btn-block" style="margin-top: 20px; display: none;">📥 Download ID Card</button>
+                </div>
+            </div>
+
+            <!-- Registered Participants List -->
+            <div class="card" style="margin-top: 30px;">
+                <h2>Registered Participants</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search by name or ID...">
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Institute</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participantsList">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #999;">No participants registered yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ATTENDANCE PAGE -->
+    <div id="attendance" class="page">
+        <div class="container">
+            <h1>Mark Attendance</h1>
+            
+            <!-- QR Scanner Panel -->
+            <div class="card">
+                <h2>Quick Attendance Marking</h2>
+                
+                <div class="form-group">
+                    <label>Select Session *</label>
+                    <select id="sessionSelect" required>
+                        <option value="">-- Choose a session --</option>
+                        <option value="Day1-Morning">Day 1 - Morning (09:00 - 12:00)</option>
+                        <option value="Day1-Afternoon">Day 1 - Afternoon (14:00 - 17:00)</option>
+                        <option value="Day2-Morning">Day 2 - Morning (09:00 - 12:00)</option>
+                        <option value="Day2-Afternoon">Day 2 - Afternoon (14:00 - 17:00)</option>
+                        <option value="Day3-Morning">Day 3 - Morning (09:00 - 12:00)</option>
+                        <option value="Day3-Afternoon">Day 3 - Afternoon (14:00 - 17:00)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button id="startQrScan" class="btn btn-primary">📱 Start QR Scanner</button>
+                    <button id="stopQrScan" class="btn btn-secondary" style="display: none;">⏹️ Stop Scanner</button>
+                </div>
+
+                <div id="qrScannerContainer" style="display: none; margin-top: 20px;">
+                    <div id="qrScanner" style="width: 100%; max-width: 500px; margin: 0 auto;"></div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+                    <strong>Or manually enter ID:</strong>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <input type="text" id="manualParticipantId" placeholder="e.g., BINDS-0001" style="flex: 1;">
+                        <button class="btn btn-success" onclick="markAttendanceManual()">Mark Present</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Sheet -->
+            <div class="card" style="margin-top: 30px;">
+                <h2>Attendance Sheet</h2>
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="downloadAttendanceSheet()">📥 Download as CSV</button>
+                </div>
+                <div class="table-responsive" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Participant ID</th>
+                                <th>Name</th>
+                                <th>Day 1 - Morning</th>
+                                <th>Day 1 - Afternoon</th>
+                                <th>Day 2 - Morning</th>
+                                <th>Day 2 - Afternoon</th>
+                                <th>Day 3 - Morning</th>
+                                <th>Day 3 - Afternoon</th>
+                                <th>Total Sessions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTable">
+                            <tr>
+                                <td colspan="9" style="text-align: center; color: #999;">No attendance data yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERT NOTIFICATION -->
+    <div id="alert" class="alert"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
