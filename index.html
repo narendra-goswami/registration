@@ -176,8 +176,10 @@
             <div class="card" style="margin-top: 30px;">
                 <h2>Attendance Sheet</h2>
                 <div class="button-group">
-                    <button class="btn btn-success" onclick="downloadAttendanceSheet()">📥 Download as CSV</button>
-                </div>
+    <button class="btn btn-success" onclick="downloadAttendanceSheet()">📥 Download as CSV</button>
+    <button class="btn btn-primary" onclick="exportAllData()">💾 Backup All Data (JSON)</button>
+    <button class="btn btn-primary" onclick="importAllData()">📤 Restore Backup (JSON)</button>
+</div>
                 <div class="table-responsive" style="margin-top: 20px;">
                     <table>
                         <thead>
