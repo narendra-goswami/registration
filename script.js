@@ -1,3 +1,14 @@
+/ ==========================================
+// IMAGE LOADING FOR LOGOS
+// ==========================================
+
+// Load images (place binds-logo.png and apu-logo.png in same folder)
+const workshopLogo = new Image();
+workshopLogo.src = 'binds-logo.png';
+
+const universityLogo = new Image();
+universityLogo.src = 'apu-logo.png';
+
 // ==========================================
 // DATA MANAGEMENT (LocalStorage)
 // ==========================================
@@ -58,20 +69,17 @@ function setupNavigation() {
             const page = btn.getAttribute('data-page');
             switchPage(page);
             
-            // Update active button
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
     });
 
-    // Page switching with buttons
     document.querySelectorAll('[data-page]').forEach(el => {
         if (el.classList.contains('btn')) {
             el.addEventListener('click', (e) => {
                 const page = el.getAttribute('data-page');
                 switchPage(page);
                 
-                // Update nav
                 const navBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
                 if (navBtn) {
                     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -88,7 +96,6 @@ function switchPage(pageName) {
     if (page) {
         page.classList.add('active');
         
-        // Refresh data when switching to pages
         if (pageName === 'home') updateHomeStats();
         if (pageName === 'registration') loadParticipantsList();
         if (pageName === 'attendance') loadAttendanceSheet();
@@ -103,7 +110,6 @@ function updateHomeStats() {
     const totalParticipants = workshopData.participants.length;
     let totalAttended = 0;
     
-    // Count unique participants who attended at least one session
     workshopData.participants.forEach(p => {
         if (workshopData.attendance[p.id] && workshopData.attendance[p.id].length > 0) {
             totalAttended++;
@@ -137,8 +143,8 @@ function registerParticipant() {
         return;
     }
 
-    // Generate unique ID
-    const id = 'BINDS-' + String(workshopData.participants.length + 1).padStart(4, '0');
+    // ✅ FIX 5: Changed from padStart(4, '0') to padStart(2, '0') - ID format BINDS-00
+    const id = 'BINDS-' + String(workshopData.participants.length + 1).padStart(2, '0');
 
     const participant = {
         id: id,
@@ -154,13 +160,10 @@ function registerParticipant() {
     if (saveData()) {
         showAlert(`✅ ${name} registered! ID: ${id}`, 'success');
         
-        // Show ID card
         displayIdCard(participant);
         
-        // Reset form
         document.getElementById('registrationForm').reset();
         
-        // Refresh list
         loadParticipantsList();
         updateHomeStats();
     }
@@ -171,10 +174,8 @@ function displayIdCard(participant) {
     document.getElementById('cardName').textContent = participant.name;
     document.getElementById('cardId').textContent = participant.id;
 
-    // Clear previous QR
     document.getElementById('qrCodeContainer').innerHTML = '';
     
-    // Generate QR code
     new QRCode(document.getElementById('qrCodeContainer'), {
         text: participant.id,
         width: 150,
@@ -187,7 +188,6 @@ function displayIdCard(participant) {
     preview.style.display = 'block';
     document.getElementById('downloadIdCard').style.display = 'block';
     
-    // Setup download
     document.getElementById('downloadIdCard').onclick = () => downloadIdCard(participant);
 }
 
@@ -212,6 +212,23 @@ function downloadIdCard(participant) {
     ctx.textAlign = 'center';
     ctx.fillText('🌿 BINDS – Chapter 2', canvas.width / 2, 50);
 
+    // ✅ FIX 4: Logo placeholders (edit these to add actual logos)
+    // LEFT SIDE: Workshop Logo placeholder
+    ctx.strokeStyle = '#ddd';
+    ctx.strokeRect(20, 30, 60, 60);
+    ctx.fillStyle = '#ccc';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Logo', 50, 65);
+
+    // RIGHT SIDE: University Logo placeholder
+    ctx.strokeStyle = '#ddd';
+    ctx.strokeRect(320, 30, 60, 60);
+    ctx.fillStyle = '#ccc';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('APU Logo', 350, 65);
+
     // QR Code
     const qrImg = document.querySelector('#qrCodeContainer canvas');
     if (qrImg) {
@@ -224,25 +241,26 @@ function downloadIdCard(participant) {
         ctx.drawImage(qrCanvas, (canvas.width - 150) / 2, 80, 150, 150);
     }
 
-    // Name
-    ctx.fillStyle = '#1a1a1a';
+    // ✅ FIX 3: Simplified ID card (removed "Name:" and "ID:" labels)
+    // Name (direct - no label)
+    ctx.fillStyle = '#2d7d6a';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('Name:', canvas.width / 2, 270);
-    
-    ctx.fillStyle = '#2d7d6a';
-    ctx.font = '12px Arial';
-    ctx.fillText(participant.name, canvas.width / 2, 290);
+    ctx.fillText(participant.name, canvas.width / 2, 280);
 
-    // ID
-    ctx.fillStyle = '#1a1a1a';
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('ID:', canvas.width / 2, 330);
-    
+    // ID (direct - no label)
     ctx.fillStyle = '#2d7d6a';
-    ctx.font = 'bold 12px Arial';
-    ctx.fillText(participant.id, canvas.width / 2, 350);
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(participant.id, canvas.width / 2, 330);
+
+    // Date and University info at bottom
+    const today = new Date().toLocaleDateString('en-IN');
+    ctx.fillStyle = '#999';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Azim Premji University, Bhopal', canvas.width / 2, 400);
+    ctx.fillText('29-31 January 2026', canvas.width / 2, 415);
 
     // Download
     canvas.toBlob(function(blob) {
@@ -259,11 +277,22 @@ function downloadIdCard(participant) {
     showAlert('ID Card downloaded!', 'success');
 }
 
+// ✅ FIX 1: Function to download ID card from list
+function downloadIdCardFromList(participantId, participantName) {
+    const participant = workshopData.participants.find(p => p.id === participantId);
+    if (participant) {
+        downloadIdCard(participant);
+    } else {
+        showAlert('Participant not found', 'error');
+    }
+}
+
+// ✅ FIX 1: Updated function with download button
 function loadParticipantsList() {
     const tbody = document.getElementById('participantsList');
     
     if (workshopData.participants.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No participants registered yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No participants registered yet</td></tr>';
         return;
     }
 
@@ -276,7 +305,8 @@ function loadParticipantsList() {
             <td>${p.email}</td>
             <td>${p.institute}</td>
             <td>
-                <button class="btn btn-secondary" onclick="deleteParticipant('${p.id}')">Delete</button>
+                <button class="btn btn-secondary" onclick="downloadIdCardFromList('${p.id}', '${p.name}')" style="font-size: 12px;">📥 ID</button>
+                <button class="btn btn-secondary" onclick="deleteParticipant('${p.id}')" style="font-size: 12px;">Delete</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -299,7 +329,7 @@ function searchParticipants() {
 
     tbody.innerHTML = '';
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No participants found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No participants found</td></tr>';
         return;
     }
 
@@ -311,7 +341,8 @@ function searchParticipants() {
             <td>${p.email}</td>
             <td>${p.institute}</td>
             <td>
-                <button class="btn btn-secondary" onclick="deleteParticipant('${p.id}')">Delete</button>
+                <button class="btn btn-secondary" onclick="downloadIdCardFromList('${p.id}', '${p.name}')" style="font-size: 12px;">📥 ID</button>
+                <button class="btn btn-secondary" onclick="deleteParticipant('${p.id}')" style="font-size: 12px;">Delete</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -338,45 +369,63 @@ function deleteParticipant(id) {
 let qrScanner = null;
 
 function setupAttendance() {
-    document.getElementById('startQrScan').addEventListener('click', startQrScanner);
-    document.getElementById('stopQrScan').addEventListener('click', stopQrScanner);
+    const startBtn = document.getElementById('startQrScan');
+    const stopBtn = document.getElementById('stopQrScan');
+    
+    if (startBtn) startBtn.addEventListener('click', startQrScanner);
+    if (stopBtn) stopBtn.addEventListener('click', stopQrScanner);
 }
 
+// ✅ FIX 2: Improved QR Scanner with better error handling
 function startQrScanner() {
     const sessionSelect = document.getElementById('sessionSelect');
-    if (!sessionSelect.value) {
+    if (!sessionSelect || !sessionSelect.value) {
         showAlert('Please select a session first', 'error');
         return;
     }
 
     const container = document.getElementById('qrScannerContainer');
+    if (!container) {
+        console.error('❌ qrScannerContainer not found');
+        showAlert('QR Scanner container missing', 'error');
+        return;
+    }
+    
     container.style.display = 'block';
 
-    const scanner = new Html5QrcodeScanner('qrScanner', {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        rememberLastCamera: true,
-        aspectRatio: 1.0
-    });
+    try {
+        console.log('📱 Starting QR Scanner...');
+        
+        const scanner = new Html5QrcodeScanner('qrScanner', {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            rememberLastCamera: true,
+            aspectRatio: 1.0
+        });
 
-    scanner.render(success, error);
+        scanner.render(success, error);
 
-    function success(decodedText) {
-        console.log('QR decoded:', decodedText);
-        markAttendanceByQr(decodedText);
-        scanner.clear();
+        function success(decodedText) {
+            console.log('✅ QR decoded:', decodedText);
+            markAttendanceByQr(decodedText);
+            scanner.clear();
+            document.getElementById('qrScannerContainer').style.display = 'none';
+            document.getElementById('startQrScan').style.display = 'block';
+            document.getElementById('stopQrScan').style.display = 'none';
+        }
+
+        function error(err) {
+            console.log('⚠️ QR Scanner error:', err);
+        }
+
+        qrScanner = scanner;
+        document.getElementById('startQrScan').style.display = 'none';
+        document.getElementById('stopQrScan').style.display = 'block';
+    } catch (err) {
+        console.error('❌ QR Scanner error:', err);
+        showAlert('Camera access denied or QR scanner not supported', 'error');
         document.getElementById('qrScannerContainer').style.display = 'none';
-        document.getElementById('startQrScan').style.display = 'block';
-        document.getElementById('stopQrScan').style.display = 'none';
     }
-
-    function error(err) {
-        console.log('QR error:', err);
-    }
-
-    qrScanner = scanner;
-    document.getElementById('startQrScan').style.display = 'none';
-    document.getElementById('stopQrScan').style.display = 'block';
 }
 
 function stopQrScanner() {
@@ -508,24 +557,85 @@ function downloadAttendanceSheet() {
 }
 
 // ==========================================
+// DATA EXPORT & IMPORT (Backup/Restore) - FIX 6
+// ==========================================
+
+function exportAllData() {
+    const backup = {
+        exportDate: new Date().toLocaleString('en-IN'),
+        workshopName: 'BINDS – Chapter 2',
+        participants: workshopData.participants,
+        attendance: workshopData.attendance
+    };
+
+    const dataStr = JSON.stringify(backup, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `BINDS_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showAlert('✅ Complete backup exported!', 'success');
+}
+
+function importAllData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const imported = JSON.parse(event.target.result);
+                
+                if (!imported.participants) {
+                    showAlert('❌ Invalid backup file', 'error');
+                    return;
+                }
+
+                if (confirm(`Import ${imported.participants.length} participants and attendance data?`)) {
+                    workshopData.participants = imported.participants;
+                    workshopData.attendance = imported.attendance || {};
+                    
+                    if (saveData()) {
+                        showAlert('✅ Data restored successfully!', 'success');
+                        location.reload();
+                    }
+                }
+            } catch (error) {
+                showAlert('❌ Error reading backup file: ' + error.message, 'error');
+            }
+        };
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 BINDS System Initializing...');
     
-    // Load data
     initializeData();
     
-    // Setup
     setupNavigation();
     setupRegistration();
     setupAttendance();
     
-    // Initial load
     updateHomeStats();
     loadParticipantsList();
     loadAttendanceSheet();
     
-    console.log('✅ System ready');
+    console.log('✅ System ready with all 6 fixes applied');
 });
